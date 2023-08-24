@@ -38,6 +38,44 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+/*New*/
+static int cmd_si(char *args){
+	int step;
+	if (args == NULL) step = 1;
+	else sscanf(args,"%d",&step);
+//	printf("%d\n",step);
+	cpu_exec(step);
+	return 0;
+}
+
+static int cmd_info(char *args){
+	if (args == NULL) {
+		printf("Wrong Command!\n");
+		return 0;
+	}
+	if (args[0] == 'r'){
+		int i;
+		for (i = R_EAX; i <= R_EDI ;i++){
+			printf("%s  0x%08x\n",regsl[i],reg_l(i));
+		}
+		printf("eip  0x%08x\n",cpu.eip);
+	}
+	return 0;
+}
+
+static int cmd_x(char *args){
+	if (args == NULL) {
+                printf("Wrong Command!\n");
+                return 0;
+        }
+	int N,exprs;
+	sscanf(args,"%d%x",&N,&exprs);
+	int i;
+	for (i=0;i<N;i++){
+		printf("0x%x  0x%08x\n",exprs+i*4,swaddr_read(exprs+i*4,4));
+	}
+	return 0;
+}
 static struct {
 	char *name;
 	char *description;
@@ -46,7 +84,9 @@ static struct {
 	{ "help", "Display informations about all supported commands", cmd_help },
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
-
+	{ "si", "Execute some steps, initial -> 1 step", cmd_si},
+	{ "info", "Print values of all registers", cmd_info},
+	{ "x", "Calculate expressions, let it be the starting memery address, print continuous N 4 bytes.",cmd_x},
 	/* TODO: Add more commands */
 
 };
