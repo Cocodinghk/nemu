@@ -5,24 +5,25 @@
 
 typedef int FLOAT;
 
+//FLOAT a表示以浮点数格式对应的补码算出来的值，不是实际的浮点数值
 static inline int F2int(FLOAT a) {
-	nemu_assert(0);
-	return 0;
+	//nemu_assert(0);
+	return a>>16;
 }
 
 static inline FLOAT int2F(int a) {
-	nemu_assert(0);
-	return 0;
+	//nemu_assert(0);
+	return a<<16;
 }
 
 static inline FLOAT F_mul_int(FLOAT a, int b) {
-	nemu_assert(0);
-	return 0;
+	//nemu_assert(0);
+	return a*b;
 }
 
 static inline FLOAT F_div_int(FLOAT a, int b) {
-	nemu_assert(0);
-	return 0;
+	//nemu_assert(0);
+	return a/b;
 }
 
 FLOAT f2F(float);

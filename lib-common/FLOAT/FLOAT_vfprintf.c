@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "FLOAT.h"
+#include <sys/mman.h>
 
 extern char _vfprintf_internal;
 extern char _fpmaxtostr;
+extern char _ppfs_setargs;
+
 extern int __stdio_fwrite(char *buf, int len, FILE *stream);
 
 __attribute__((used)) static int format_FLOAT(FILE *stream, FLOAT f) {
@@ -16,7 +19,36 @@ __attribute__((used)) static int format_FLOAT(FILE *stream, FLOAT f) {
 	 */
 
 	char buf[80];
-	int len = sprintf(buf, "0x%08x", f);
+	int len = 0;//sprintf(buf, "0x%08x", f);
+	if(f<0)
+	{
+		buf[len++]='-';
+		f=-f;
+	}
+	int ret=(f>>16);
+	while(ret!=0)
+	{
+		buf[len++]='0'+ret%10;
+		ret/=10;
+	}
+	char tmp;
+	int l=0, r=len-1;
+	if(buf[0]=='-') l++;
+	while(l<r)
+	{
+		tmp=buf[l];
+		buf[l]=buf[r];
+		buf[r]=tmp;
+	}
+	buf[len++]='.';
+	f&=0xffff;
+	int i=0;
+	for(i=0;i<6;i++)
+	{
+		f=f*10;
+		buf[len++]='0'+(f>>16);
+		f=f&0xffff;
+	}
 	return __stdio_fwrite(buf, len, stream);
 }
 
@@ -26,6 +58,26 @@ static void modify_vfprintf() {
 	 * is the code section in _vfprintf_internal() relative to the
 	 * hijack.
 	 */
+	void *p=(void *)(int)&_vfprintf_internal+(0x80497f9-0x80494f3);
+	p++;
+	*(int *)p+=((int)format_FLOAT-(int)&_fpmaxtostr);
+	p--;
+	p-=(0xb4-0xaa);
+	*(char *)p=0xff;
+	p++;
+	*(char *)p=0x32;
+	p++;
+	*(char *)p=0x90;
+	p-=2;
+	p-=3;
+	p+=2;
+	*(char *)p-=0x4;
+	p-=2;
+	p-=(0x8049de4-0x8049dcf);
+	*(char *)p=0x90;
+	*(char *)(p+1)=0x90;
+	*(char *)(p+4)=0x90;
+	*(char *)(p+5)=0x90;
 
 #if 0
 	else if (ppfs->conv_num <= CONV_A) {  /* floating point */
@@ -72,7 +124,12 @@ static void modify_ppfs_setargs() {
 	 * Below is the code section in _vfprintf_internal() relative to
 	 * the modification.
 	 */
-
+	void *p=&_ppfs_setargs;
+	p+=(0x804a0f1 - 0x804a080);
+	*(char *)p=0xe9;
+	p++;
+	*(int *)p=(0x804a123 - 0x804a0f1 - 5);
+	
 #if 0
 	enum {                          /* C type: */
 		PA_INT,                       /* int */

@@ -2,6 +2,7 @@
 #include "memory.h"
 #include <string.h>
 #include <elf.h>
+#include <stdio.h>
 
 #define ELF_OFFSET_IN_DISK 0
 
@@ -27,29 +28,34 @@ uint32_t loader() {
 #else
 	ramdisk_read(buf, ELF_OFFSET_IN_DISK, 4096);
 #endif
-
+//buf应该指向整个文件开始的地方
 	elf = (void*)buf;
 
 	/* TODO: fix the magic number with the correct one */
-	const uint32_t elf_magic = 0xBadC0de;
+	const uint32_t elf_magic = 0x464c457f;
 	uint32_t *p_magic = (void *)buf;
 	nemu_assert(*p_magic == elf_magic);
 
 	/* Load each program segment */
-	panic("please implement me");
-	for(; true; ) {
+	//panic("please implement me");
+	int i;
+	ph=(void*)(buf+elf->e_phoff);//ph指向程序头表在文件中的位置
+	for(i=0; i<elf->e_phnum; i++) {
 		/* Scan the program header table, load each segment into memory */
 		if(ph->p_type == PT_LOAD) {
 
 			/* TODO: read the content of the segment from the ELF file 
 			 * to the memory region [VirtAddr, VirtAddr + FileSiz)
 			 */
-			 
+			 //ramdisk_read(uint8_t *buf,uint32_t offset,uint32_t len);
+			 //负责从ramdisk中offset偏移处的len字节读入buf中
+			 ramdisk_read((void*)(ph->p_vaddr),ph->p_offset,ph->p_filesz);
 			 
 			/* TODO: zero the memory region 
 			 * [VirtAddr + FileSiz, VirtAddr + MemSiz)
 			 */
-
+			memset((void*)(ph->p_vaddr+ph->p_filesz),0,ph->p_memsz-ph->p_filesz);
+			ph++;//？？？
 
 #ifdef IA32_PAGE
 			/* Record the program break for future use. */
