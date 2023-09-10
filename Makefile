@@ -3,7 +3,6 @@
 .PHONY: nemu entry testcase kernel run gdb test submit clean
 
 CC := gcc
-CC4 := /usr/bin/gcc-4.4
 LD := ld
 CFLAGS := -MMD -Wall -Werror -c
 
@@ -11,7 +10,7 @@ LIB_COMMON_DIR := lib-common
 LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include
 LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib
 LIBC := $(LIBC_LIB_DIR)/libc.a
-#FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
+FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
 
 include config/Makefile.git
 include config/Makefile.build
@@ -54,8 +53,9 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
-USERPROG := obj/testcase/mov
-ENTRY := $(USERPROG)
+USERPROG := obj/testcase/print-FLOAT
+# ENTRY := $(USERPROG)
+ENTRY := $(kernel_BIN)
 
 entry: $(ENTRY)
 	objcopy -S -O binary $(ENTRY) entry
