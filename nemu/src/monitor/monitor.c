@@ -74,13 +74,8 @@ static void load_entry() {
 	fclose(fp);
 }
 
-static void init_eflags(){
-	cpu.EFLAGS = 0x00000002;
-}
 void restart() {
 	/* Perform some initialization to restart a program */
-	init_eflags();
-
 #ifdef USE_RAMDISK
 	/* Read the file with name `argv[1]' into ramdisk. */
 	init_ramdisk();
@@ -91,6 +86,8 @@ void restart() {
 
 	/* Set the initial instruction pointer. */
 	cpu.eip = ENTRY_START;
+
+	cpu.eflags.val=2;
 
 	/* Initialize DRAM. */
 	init_ddr3();

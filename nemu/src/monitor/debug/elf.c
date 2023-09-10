@@ -80,33 +80,47 @@ void load_elf_tables(int argc, char *argv[]) {
 
 	fclose(fp);
 }
-uint32_t GetMarkValue(char* str,bool* success){
+
+uint32_t get_X_val(char* var, bool* suc)
+{
 	int i;
-	for (i = 0; i < nr_symtab_entry; i++){
-		if ((symtab[i].st_info & 0xf) == STT_OBJECT){
-			char syb[32];
-			int stlen = strlen(str);
-			strncpy(syb,strtab + symtab[i].st_name,stlen);
-			syb [stlen] = '\0';
-			if (strcmp(syb,str) == 0){
-				return symtab[i].st_value;
-			} 
+	*suc=true;
+	for(i=0;i<nr_symtab_entry;i++)
+	{
+		if((symtab[i].st_info&0xf)==STT_OBJECT)
+		{
+			char sym[32];
+			char *tmp=strtab+symtab[i].st_name;
+			int len=strlen(tmp);
+			strncpy(sym,tmp,len);
+			sym[len]='\0';
+			if(strcmp(sym,var)==0)
+			return symtab[i].st_value;
 		}
 	}
-	*success = false;
+	*suc=false;
 	return 0;
 }
 
-void GetFunctionAddr(swaddr_t cur_addr,char* name){
+//由于ret_addr和name都要在函数中被修改，所以这里用指针类型的参数
+void get_func_name(swaddr_t* ret_addr,char* name)
+{
 	int i;
-	for (i = 0; i < nr_symtab_entry; i++){
-		if ((symtab[i].st_info & 0xf) == STT_FUNC){
-			// printf("0x%08x\n",symtab[i].st_value);
-			if (cur_addr >= symtab[i].st_value && symtab[i].st_value + symtab[i].st_size >= cur_addr){
-				strcpy(name,strtab + symtab[i].st_name);
+	for(i=0;i<nr_symtab_entry;i++)
+	{
+		if((symtab[i].st_info&0xf)==STT_FUNC)
+		{
+			uint32_t start = symtab[i].st_value;
+			uint32_t end = symtab[i].st_value+symtab[i].st_size;
+			if((*ret_addr>=start) && (*ret_addr<end))
+			{
+				int len=strlen(symtab[i].st_name + strtab);
+				strncpy(name,strtab + symtab[i].st_name,len);
+				name[len]='\0';
 				return;
 			}
 		}
 	}
 	name[0]='\0';
+	return;
 }
