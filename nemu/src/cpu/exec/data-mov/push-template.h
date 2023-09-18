@@ -12,10 +12,9 @@
 
 //为了保险起见我们开栈都以4字节为单位
 static void do_execute(){
-	if(DATA_BYTE==1)
-		op_src->val=(int8_t)op_src->val;
+	op_src->val=op_src->val;
 	reg_l(R_ESP)-=4;
-	swaddr_write(reg_l(R_ESP),4,op_src->val);
+	swaddr_write(reg_l(R_ESP),4,op_src->val,R_SS);
 	print_asm_template1();
 }
 

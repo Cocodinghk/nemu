@@ -17,10 +17,10 @@ static void do_execute()
     //注意EBP自己不要清零，后面还要用呢
     swaddr_t i;
     for(i=cpu.esp;i<cpu.ebp;i+=DATA_BYTE)
-        MEM_W(i,0);
+        MEM_W(i,0,2);
     cpu.esp=cpu.ebp;
-    REG(R_EBP)=swaddr_read(REG(R_ESP),DATA_BYTE);
-    MEM_W(REG(R_ESP),0);
+    REG(R_EBP)=swaddr_read(REG(R_ESP),DATA_BYTE,2);
+    MEM_W(REG(R_ESP),0,2);
     reg_l(R_ESP)+=DATA_BYTE;
     print_asm("leave");
 }

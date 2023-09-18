@@ -87,7 +87,7 @@ make_group(group6,
 	inv, inv, inv, inv)
 
 make_group(group7,
-	inv, inv, inv, inv, 
+	inv, inv, lgdt_rm_v, inv, 
 	inv, inv, inv, inv)
 
 
@@ -96,8 +96,8 @@ make_group(group7,
 helper_fun opcode_table [256] = {
 /* 0x00 */	inv, add_r2rm_v, inv, add_rm2r_v,
 /* 0x04 */	inv, add_i2a_v, inv, inv,
-/* 0x08 */	inv, or_r2rm_v, or_rm2r_b, inv,
-/* 0x0c */	or_i2a_b, inv, inv, _2byte_esc,
+/* 0x08 */	or_r2rm_b, or_r2rm_v, or_rm2r_b, or_rm2r_v,
+/* 0x0c */	or_i2a_b, or_i2a_v, inv, _2byte_esc,
 /* 0x10 */	inv, adc_r2rm_v, inv, inv,
 /* 0x14 */	inv, inv, inv, inv,
 /* 0x18 */	inv, sbb_r2rm_v, inv, inv,
@@ -129,7 +129,7 @@ helper_fun opcode_table [256] = {
 /* 0x80 */	group1_b, group1_v, inv, group1_sx_v, 
 /* 0x84 */	test_r2rm_b, test_r2rm_v, inv, inv,
 /* 0x88 */	mov_r2rm_b, mov_r2rm_v, mov_rm2r_b, mov_rm2r_v,
-/* 0x8c */	inv, lea, inv, inv,
+/* 0x8c */	inv, lea, mov_sreg2rm, inv,
 /* 0x90 */	nop, inv, inv, inv,
 /* 0x94 */	inv, inv, inv, inv,
 /* 0x98 */	inv, cltd_v, inv, inv,
@@ -152,12 +152,12 @@ helper_fun opcode_table [256] = {
 /* 0xdc */	inv, inv, inv, inv,
 /* 0xe0 */	inv, inv, inv, inv,
 /* 0xe4 */	inv, inv, inv, inv,
-/* 0xe8 */	call_i_v, jmp_si_l, inv, jmp_si_b,
+/* 0xe8 */	call_i_v, jmp_si_l, ljmp, jmp_si_b,
 /* 0xec */	inv, inv, inv, inv,
 /* 0xf0 */	inv, inv, repnz, rep,
 /* 0xf4 */	inv, inv, group3_b, group3_v,
 /* 0xf8 */	inv, inv, inv, inv,
-/* 0xfc */	inv, inv, group4, group5
+/* 0xfc */	cld, std, group4, group5
 };
 
 helper_fun _2byte_opcode_table [256] = {
@@ -169,7 +169,7 @@ helper_fun _2byte_opcode_table [256] = {
 /* 0x14 */	inv, inv, inv, inv, 
 /* 0x18 */	inv, inv, inv, inv, 
 /* 0x1c */	inv, inv, inv, inv, 
-/* 0x20 */	inv, inv, inv, inv, 
+/* 0x20 */	mov_cr2r, inv, mov_r2cr, inv, 
 /* 0x24 */	inv, inv, inv, inv,
 /* 0x28 */	inv, inv, inv, inv, 
 /* 0x2c */	inv, inv, inv, inv, 
@@ -196,7 +196,7 @@ helper_fun _2byte_opcode_table [256] = {
 /* 0x80 */	inv, inv, inv, inv,
 /* 0x84 */	je_i_v, jne_i_v, jbe_i_v, ja_i_v,
 /* 0x88 */	js_i_v, inv, inv, inv, 
-/* 0x8c */	inv, jge_i_v, jle_i_v, inv, 
+/* 0x8c */	inv, jge_i_v, jle_i_v, jg_i_v, 
 /* 0x90 */	inv, inv, inv, inv,
 /* 0x94 */	sete_rm_b, setne_rm_b, inv, inv,
 /* 0x98 */	inv, inv, inv, inv, 

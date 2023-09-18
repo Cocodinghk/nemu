@@ -12,9 +12,9 @@
 
 static void do_execute(){
 	//一字节的情况我确实不懂，先空着，毕竟pop也涉及不到一字节
-	OPERAND_W(op_src,MEM_R(reg_l(R_ESP)));
+	OPERAND_W(op_src,MEM_R(reg_l(R_ESP),2));
 	//REG(R_ESP)是栈顶地址，MEM_R后将栈顶的内容取出来
-	swaddr_write(reg_l(R_ESP),4,0);
+	swaddr_write(reg_l(R_ESP),4,0,R_SS);
 	reg_l(R_ESP)+=4;
 	print_asm_template1();
 }

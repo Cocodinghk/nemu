@@ -2,6 +2,7 @@
 #include "monitor/expr.h"
 #include "monitor/watchpoint.h"
 #include "nemu.h"
+#include "memory/cache.h"
 
 #include <stdlib.h>
 #include <readline/readline.h>
@@ -52,6 +53,10 @@ static int cmd_d(char *args);
 
 static int cmd_bt(char *args);
 
+static int cmd_cache();
+
+static int cmd_page(char *args);
+
 static struct {
 	char *name;
 	char *description;
@@ -66,7 +71,9 @@ static struct {
 	{ "p", "Evaluate the result of the given expression.", cmd_p },
 	{ "w", "Set watchpoint.", cmd_w },
 	{ "d", "Delete watchpoint.", cmd_d },
-	{ "bt", "Print stack.", cmd_bt}
+	{ "bt", "Print stack.", cmd_bt},
+	{ "p_cache", "print cache time", cmd_cache},
+	{ "page", "打印对应物理地址", cmd_page}
 	/* TODO: Add more commands */
 
 };
@@ -129,7 +136,7 @@ static int cmd_x(char *args)
 	for(i=0;i<step;i++){
 		if(i%4==0)
 			printf("0x%08x: ",addr+i*4);
-		printf("0x%08x  ", swaddr_read(addr+4*i,4));
+		printf("0x%08x  ", swaddr_read(addr+4*i,4,R_DS));
 		if((i+1)%4==0||i==step-1)
 			printf("\n");
 	}
@@ -263,12 +270,28 @@ static int cmd_bt(char *args)
 				//原因是eip在的cpu_exec()函数执行完后还会加上ret指令返回的长度1
 				//那个时候的eip才是正确的，所以在这里要给它加上1
 			}
-			printf("The first four arguments are: 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",swaddr_read(now.prev_ebp+8,4),swaddr_read(now.prev_ebp+12,4),swaddr_read(now.prev_ebp+16,4),swaddr_read(now.prev_ebp+20,4));
+			printf("The first four arguments are: 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",swaddr_read(now.prev_ebp+8,4,R_SS),swaddr_read(now.prev_ebp+12,4,R_SS),swaddr_read(now.prev_ebp+16,4,R_SS),swaddr_read(now.prev_ebp+20,4,R_SS));
 			//下面这两行的顺序千万别写反了！！
-			now.ret_addr=swaddr_read(now.prev_ebp+4,4);
-			now.prev_ebp=swaddr_read(now.prev_ebp,4);
+			now.ret_addr=swaddr_read(now.prev_ebp+4,4,R_SS);
+			now.prev_ebp=swaddr_read(now.prev_ebp,4,R_SS);
 		}
 	}
+	return 0;
+}
+
+static int cmd_cache()
+{
+	print_time();
+	return 1;
+}
+
+hwaddr_t cmd_page_translate(lnaddr_t addr);
+static int cmd_page(char* args){
+	if(args == NULL) { printf("parameter invalid!\n"); return 0; }
+	uint32_t addr;
+	sscanf(args, "%x", &addr);
+	hwaddr_t ans = cmd_page_translate(addr);
+	if(ans) printf("Addr is 0x%08x\n",ans);
 	return 0;
 }
 

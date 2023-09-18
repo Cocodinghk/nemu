@@ -15,6 +15,7 @@
 #include "data-mov/push.h"
 #include "data-mov/pop.h"
 #include "data-mov/leave.h"
+#include "data-mov/lgdt.h"
 
 #include "arith/adc.h"
 #include "arith/dec.h"
@@ -60,6 +61,8 @@
 #include "string/stos.h"
 #include "string/movs.h"
 #include "string/lods.h"
+#include "string/cld.h"
+#include "string/std.h"
 
 #include "misc/misc.h"
 

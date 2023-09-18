@@ -381,7 +381,7 @@ int eval(int p,int q, bool *success)
 			case NEG:
 				return -1*val2;
 			case DEREF:
-				return swaddr_read(val2,4);
+				return swaddr_read(val2,4,R_DS);
 			default:
 				assert(0);
 			}		

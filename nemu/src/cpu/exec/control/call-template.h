@@ -4,9 +4,9 @@
 
 make_helper(concat(call_i_,SUFFIX))
 {
-	int len=concat(decode_i_,SUFFIX)(cpu.eip+1);
+	int len=concat(decode_i_,SUFFIX)(eip+1);
 	reg_l(R_ESP)-=DATA_BYTE;
-	swaddr_write(reg_l(R_ESP),4,cpu.eip+len);
+	swaddr_write(reg_l(R_ESP),4,cpu.eip+len,R_SS);
 	/*the third argument is not cpu.eip+len+1,though it should be, cuz that is the beginnig pos of the next command. But we need to consider ret. When ret, we need to return 1. So this length here plus 1 is the final pos. Also,you can let call return cpu.eip+len+1,let ret return 0.*/
 	DATA_TYPE_S imm=op_src->val;//the displacement
 	print_asm("call 0x%x",cpu.eip+1+len+imm);
@@ -15,9 +15,9 @@ make_helper(concat(call_i_,SUFFIX))
 	return len+1;
 }
 make_helper(concat(call_rm_,SUFFIX)){
-	int len=concat(decode_rm_,SUFFIX) (cpu.eip+1);
+	int len=concat(decode_rm_,SUFFIX) (eip+1);
 	reg_l (R_ESP)-=DATA_BYTE;
-	swaddr_write(reg_l (R_ESP),4,cpu.eip+len);
+	swaddr_write(reg_l (R_ESP),4,cpu.eip+len,R_SS);
 	DATA_TYPE_S imm=op_src->val;
 	print_asm("call 0x%x",imm);
 	cpu.eip=imm-len-1;
