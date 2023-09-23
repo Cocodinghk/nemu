@@ -1,4 +1,5 @@
 #include "nemu.h"
+#include "memory/cache.h"
 
 #define ENTRY_START 0x100000
 
@@ -6,6 +7,7 @@ extern uint8_t entry [];
 extern uint32_t entry_len;
 extern char *exec_file;
 
+void init_tlb();
 void load_elf_tables(int, char *[]);
 void init_regex();
 void init_wp_pool();
@@ -74,8 +76,25 @@ static void load_entry() {
 	fclose(fp);
 }
 
+static void init_cr0()
+{
+	cpu.cr0.protect_enable=0;//运行在实模式下
+	cpu.cr0.paging=0;
+}
+
+static void init_cs()
+{
+	cpu.CS.base=0;
+	cpu.CS.limit=0xffffffff;
+}
+
 void restart() {
 	/* Perform some initialization to restart a program */
+	cpu.eflags.val=2;
+	init_cache();
+	init_cr0();
+	init_cs();
+	init_tlb();
 #ifdef USE_RAMDISK
 	/* Read the file with name `argv[1]' into ramdisk. */
 	init_ramdisk();

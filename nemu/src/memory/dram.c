@@ -96,6 +96,17 @@ static void ddr3_write(hwaddr_t addr, void *data, uint8_t *mask) {
 	memcpy(dram[rank][bank][row], rowbufs[rank][bank].buf, NR_COL);
 }
 
+//因为上面ddr3_read和ddr3_write的函数定义为static，没法在外面用，所以这里又写了两个
+void ddr_read3(hwaddr_t addr,void *data)
+{
+	ddr3_read(addr,data);
+}
+
+void ddr_write3(hwaddr_t addr,void *data,uint8_t *mask)
+{
+	ddr3_write(addr,data,mask);
+}
+
 uint32_t dram_read(hwaddr_t addr, size_t len) {
 	uint32_t offset = addr & BURST_MASK;
 	uint8_t temp[2 * BURST_LEN];
